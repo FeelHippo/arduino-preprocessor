@@ -127,3 +127,7 @@ This tool use code from the following projects:
 
 - [Clang/LLVM](http://llvm.org)
 - [JSON for Modern C++](https://github.com/nlohmann/json)
+
+## Amendments:
+- install [clang llvm](https://clang.llvm.org/get_started.html)
+- `clang main.cpp ArduinoDiagnosticConsumer.cpp CommandLine.cpp IdentifiersList.cpp CodeCompletion.cpp`

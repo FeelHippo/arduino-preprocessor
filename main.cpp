@@ -85,7 +85,7 @@ public:
 
         const FunctionDecl *f = match.Nodes.getNodeAs<FunctionDecl>("function_decl");
         if (f) {
-            FullSourceLoc loc = ctx->getFullLoc(f->getLocStart());
+            FullSourceLoc loc = ctx->getFullLoc(f->getBeginLoc());
             SourceRange r = f->getSourceRange();
             FullSourceLoc begin = ctx->getFullLoc(r.getBegin());
             FullSourceLoc end = ctx->getFullLoc(r.getEnd());
@@ -127,7 +127,7 @@ public:
 
             if (outputOnlyNeededPrototypes) {
                 // Check if this function is called and needs a forward declaration
-                IdentifierLocation *und = undeclaredIdentifiers.findFirst(f->getName());
+                IdentifierLocation *und = undeclaredIdentifiers.findFirst(f->getName().str());
                 if (!und) {
                     if (debugOutput) {
                         outs() << "  This function is not forward-called and do not need a prototype.\n";
@@ -165,7 +165,7 @@ public:
                 return;
             }
 
-            FullSourceLoc loc = ctx->getFullLoc(v->getLocStart());
+            FullSourceLoc loc = ctx->getFullLoc(v->getBeginLoc());
             SourceRange r = v->getSourceRange();
             FullSourceLoc begin = ctx->getFullLoc(r.getBegin());
             FullSourceLoc end = ctx->getFullLoc(r.getEnd());
@@ -277,16 +277,25 @@ public:
         const RewriteBuffer *buf = rewriter.getRewriteBufferFor(mainFileID);
         if (buf == nullptr) {
             // No changes needed, output the source file as-is
-            auto buff = rewriter.getSourceMgr().getBuffer(mainFileID);
-            preprocessedSketch = buff->getBuffer().str();
+            auto buff = rewriter.getSourceMgr().getBufferData(mainFileID);
+            preprocessedSketch = buff.str();
         } else {
             preprocessedSketch = string(buf->begin(), buf->end());
         }
     }
 };
 
+static cl::OptionCategory arduinoToolCategory("Arduino options");
+
 int main(int argc, const char **argv) {
-    CommonOptionsParser optParser = doCommandLineParsing(argc, argv);
+    doCommandLineParsing(argc, argv, arduinoToolCategory);
+    auto ExpectedParser =
+          CommonOptionsParser::create(argc, argv, arduinoToolCategory);
+    if (!ExpectedParser) {
+        llvm::errs() << ExpectedParser.takeError();
+        return 1;
+    }
+    CommonOptionsParser& optParser = ExpectedParser.get();
     ClangTool tool(optParser.getCompilations(), optParser.getSourcePathList());
 
     ArduinoDiagnosticConsumer dc;

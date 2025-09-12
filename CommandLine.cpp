@@ -45,7 +45,7 @@ string codeCompleteFilename;
 int codeCompleteLine;
 int codeCompleteCol;
 
-static cl::OptionCategory arduinoToolCategory("Arduino options");
+// static cl::OptionCategory arduinoToolCategory("Arduino options");
 // TODO: add complete help
 static cl::extrahelp arduinoHelp("\n"
         "arduino-preprocessor is a command-line utility based on LLVM and clang tooling.\n"
@@ -62,28 +62,27 @@ static void printVersion() {
     outs() << "  arduino-preprocessor version " VERSION "\n";
 }
 
-CommonOptionsParser doCommandLineParsing(int argc, const char **argv) {
-    debugOutputOpt.setCategory(arduinoToolCategory);
+void doCommandLineParsing(int argc, const char **argv, cl::OptionCategory arduinoToolCategory) {
+    debugOutputOpt.addCategory(arduinoToolCategory);
     debugOutputOpt.setInitialValue(false);
     debugOutputOpt.setDescription("Print debugging messages from Arduino preprocessor");
 
-    outputOnlyNeededPrototypesOpt.setCategory(arduinoToolCategory);
+    outputOnlyNeededPrototypesOpt.addCategory(arduinoToolCategory);
     outputOnlyNeededPrototypesOpt.setInitialValue(false);
     outputOnlyNeededPrototypesOpt.setDescription("Output a prototype only if a forward declaration is needed (experimental)");
 
-    outputDiagnosticsOpt.setCategory(arduinoToolCategory);
+    outputDiagnosticsOpt.addCategory(arduinoToolCategory);
     outputDiagnosticsOpt.setInitialValue(false);
     outputDiagnosticsOpt.setDescription("Output diagnostics (warnings/errors) in json format");
 
-    outputCodeCompletionsOpt.setCategory(arduinoToolCategory);
+    outputCodeCompletionsOpt.addCategory(arduinoToolCategory);
     outputCodeCompletionsOpt.setInitialValue("");
     outputCodeCompletionsOpt.setDescription(
             "Output code completions (suggestions) in json format.\n"
             "This option requires the cursor position in the format \"filename:line:col\"");
 
-    cl::AddExtraVersionPrinter(printVersion);
-
-    CommonOptionsParser optParser(argc, argv, arduinoToolCategory);
+    // https://stackoverflow.com/a/57098472/10708345
+    // cl::AddExtraVersionPrinter(printVersion);
 
     /* Parse outputCodeCompletion parameter */
     if (outputCodeCompletionsOpt.getValue() != "") {
@@ -110,5 +109,4 @@ CommonOptionsParser doCommandLineParsing(int argc, const char **argv) {
     if (outputDiagnostics || outputCodeCompletions) {
         outputPreprocessedSketch = false;
     }
-    return optParser;
 }

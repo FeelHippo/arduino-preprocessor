@@ -55,7 +55,7 @@ class CustomCodeCompleteConsumer : public CodeCompleteConsumer {
 
 public:
 
-    CustomCodeCompleteConsumer(const CodeCompleteOptions &opts, SourceManager &sm) : CodeCompleteConsumer(opts, false),
+    CustomCodeCompleteConsumer(const CodeCompleteOptions &opts, SourceManager &sm) : CodeCompleteConsumer(opts),
     TUInfo(std::make_shared<GlobalCodeCompletionAllocator>()), output(json::array()), sm(sm) {
     }
 
@@ -131,13 +131,13 @@ int FindRealLineForCodeCompletion(string &code, string &filename, int line) {
 
 void DoCodeCompletion(const string &filename, const string &code, int line, int col) {
     CompilerInstance ci;
-    ci.createDiagnostics();
+    // ci.createDiagnostics();
 
     // Hide diagnostics
-    ci.getDiagnostics().setClient(new IgnoringDiagConsumer());
+    // ci.getDiagnostics().setClient(new IgnoringDiagConsumer());
 
     shared_ptr<clang::TargetOptions> tOpts = make_shared<clang::TargetOptions>();
-    tOpts->Triple = sys::getDefaultTargetTriple();
+    tOpts->Triple = "x86_64-pc-linux-gnu";
     ci.setTarget(TargetInfo::CreateTargetInfo(ci.getDiagnostics(), tOpts));
 
     LangOptions &lOpts = ci.getLangOpts();
@@ -158,7 +158,7 @@ void DoCodeCompletion(const string &filename, const string &code, int line, int 
     ci.setCodeCompletionConsumer(ccConsumer);
 
     FrontendOptions& fOpts = ci.getFrontendOpts();
-    fOpts.Inputs.push_back(FrontendInputFile(filename, InputKind::IK_CXX));
+    fOpts.Inputs.push_back(FrontendInputFile(filename, InputKind().getLanguage()));
     fOpts.CodeCompletionAt.FileName = filename;
     fOpts.CodeCompletionAt.Line = line;
     fOpts.CodeCompletionAt.Column = col;

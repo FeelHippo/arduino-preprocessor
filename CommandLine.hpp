@@ -48,4 +48,4 @@ extern string codeCompleteFilename;
 extern int codeCompleteLine;
 extern int codeCompleteCol;
 
-CommonOptionsParser doCommandLineParsing(int argc, const char **argv);
+void doCommandLineParsing(int argc, const char **argv, cl::OptionCategory arduinoToolCategory);
