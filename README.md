@@ -130,4 +130,14 @@ This tool use code from the following projects:
 
 ## Amendments:
 - install [clang llvm](https://clang.llvm.org/get_started.html)
-- `clang main.cpp ArduinoDiagnosticConsumer.cpp CommandLine.cpp IdentifiersList.cpp CodeCompletion.cpp`
+- `clang++ -v -lclang `llvm-config --cxxflags --ldflags` -Wl,--no-undefined -Wl,--unresolved-symbols=ignore-in-object-files main.cpp ArduinoDiagnosticConsumer.cpp CommandLine.cpp IdentifiersList.cpp CodeCompletion.cpp -o ./arduino-preprocessor/arduino-preprocessor `llvm-config --ldflags --libs --system-libs` -static-libstdc++`
+
+## Status Quo
+- the project can be compiled, see `./arduino-preprocessor/arduino-preprocessor` executable
+- it must be possible to verify an Arduino sketch bu running `arduino-preprocessor/arduino-preprocessor <path to sketch>`
+- blocker: `https://stackoverflow.com/questions/79765083/unexpected-plt-reloc-type-0x00`
+
+## Next Steps:
+- compile project and test sketch verification
+- this will probably require another machine
+- once working, figure out how to use it in the related Android Jetpack Compose project
